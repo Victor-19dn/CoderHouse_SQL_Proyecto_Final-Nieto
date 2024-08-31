@@ -228,7 +228,7 @@ SELECT * FROM proyecto_laboratorio.view_pedidos_mayo_julio;
 ## Documentación de funciones
 
 ## Función: edad_paciente
-Descripción: Esta función retorna la edad de un paciente ingresando su id.
+Descripción: Esta función retorna la edad de un paciente ingresando su id. Esta pensada con la finalidad de ser útil por ej. para un trabajo analítico diferenciando por rangos etarios.
 
 Parámetro:
 * id_paciente: Identificador del paciente.
@@ -336,3 +336,10 @@ Sentencias para visualizar tablas involucradas:
 SELECT * FROM Proyecto_Laboratorio.Insumos;
 SELECT * FROM Proyecto_Laboratorio.logs_precio_insumos;
 ```
+
+
+## Definición de usuarios:
+En el repositorio también se incluye un archivo sql llamado Script_Usuarios.sql donde se puede ejecutar la creación de tres usuarios seguidos por permisos para cada uno. Estos usuarios fueron pensados a modo de tres puestos con distintas tareas que podrían realizar.
+* empleado_administrativo: tiene permisos para ver la tabla Analisis y actualizar esa tabla.
+* empleado_recepcionista: tiene permiso para ver la tabla Pacientes, la vista view_pacientes__por_obra_social y realizar una inserción en la tabla Pacientes.
+* empleado_supervisor: tiene permisos para acceder a todas las tablas de la base de datos del proyecto y además tiene asignado los permisos 'WITH GRANT OPTION' por ejemplo para crear nuevos usuarios.
