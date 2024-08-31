@@ -20,6 +20,7 @@ Luego en la segunda instancia, junto con esta presentación final, el objetivo f
 
 ## Diagrama Entidad-Relación (D-E-R)
 
+![alt text](Proyecto_Laboratorio-DER.png)
 
 
 ## Listado de tablas:
