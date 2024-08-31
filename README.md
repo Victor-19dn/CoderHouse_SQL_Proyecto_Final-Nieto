@@ -99,6 +99,7 @@ Luego en la segunda instancia, junto con esta presentación final, el objetivo f
     o   fecha_modificacion
 ```
 
+
 ## Grilla de tablas con campos, tipos de datos y tipos de claves:
 ```
 +--------------------------------------------------------------------------------------------------------------------------+
@@ -168,3 +169,14 @@ Luego en la segunda instancia, junto con esta presentación final, el objetivo f
 |	                           | fecha_modificacion	   | Fecha de modificación	           | DATETIME      |               |
 +--------------------------------------------------------------------------------------------------------------------------+
 ```
+
+
+## Inserción de datos:
+Con respecto a la inserción de datos en la base de datos creada en la primera entrega del proyecto aproveché en mayor medida el recurso de la plataforma [Mokaroo](https://www.mockaroo.com/) para crear datos de forma aleatoria siguiendo ciertos parámetros que fueran funcionales para las tablas que había creado. Por otro lado también utilicé algunos tipos de análisis clínicos y precios aproximados calculados a partir del índice NBU (Nomeclador Bioquímico Único) obtenido a través de la biblioteca digital de la Confederación Unificada Bioquímica de la República Argentina [(CUBRA)](https://cubra.org.ar/biblioteca/).
+
+El script de inserción de datos mediante un archivo .sql se encuentra en el repositorio con el nombre 'Insercion_Datos.sql'. El orden de inserción en las tablas es el planteado en el script, este mismo fue probado en MySQL Workbench y funciona correctamente ejecutando el script entero. Una aclaración sobre cambios realizados en la segunda entrega que están presentes en el script es la modificación del tipo de dato de dos columnas pertenecientes a dos tablas. Por un lado modifiqué la columna cobertura de la tabla Obra_Social cambiando el tipo de dato a VARCHAR para que pudiera ingresar valores numéricos más el símbolo de porcentaje, y por otro lado, modifiqué la columna id_obra_social de la tabla Pacientes permitiendo que admita valores nulos. En este último caso lo hice considerando que posteriormente pudiera recibir valores nulos equivalentes a pacientes que no tengan una obra social.
+
+
+## Objetos de la DB:
+A continuación se detallan cada uno de los objetos que creé para la base de datos con información sobre su funcionamiento y ejemplos de uso. Antes hago una aclaración sobre la ejecución de los scripts de los objetos, la forma en la que probé varias veces haciendo un DROP de toda la DB y volviéndo a crear todo lo hice siguiendo el orden en el que fueron dados los contenidos en el curso: vistas, funciones, stored procedures y triggers. Otra cuestión importante a mencionar es que a raíz de estos objetos están incluídos en los scripts de stored procedures y triggers la creación de dos tablas nuevas, Archivo_Pacientes_Anteriores y logs_precio_insumos respectivamente.
+Así mismo menciono que en los scripts de cada objeto hay breves títulos descriptivos y ejemplos de uso mediante comentarios.
