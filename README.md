@@ -180,3 +180,158 @@ El script de inserción de datos mediante un archivo .sql se encuentra en el rep
 ## Objetos de la DB:
 A continuación se detallan cada uno de los objetos que creé para la base de datos con información sobre su funcionamiento y ejemplos de uso. Antes hago una aclaración sobre la ejecución de los scripts de los objetos, la forma en la que probé varias veces haciendo un DROP de toda la DB y volviéndo a crear todo lo hice siguiendo el orden en el que fueron dados los contenidos en el curso: vistas, funciones, stored procedures y triggers. Otra cuestión importante a mencionar es que a raíz de estos objetos están incluídos en los scripts de stored procedures y triggers la creación de dos tablas nuevas, Archivo_Pacientes_Anteriores y logs_precio_insumos respectivamente.
 Así mismo menciono que en los scripts de cada objeto hay breves títulos descriptivos y ejemplos de uso mediante comentarios.
+
+## Documentación de vistas
+
+## Vista: view_pacientes__por_obra_social
+Descripción: Esta vista muestra todos los pacientes que tienen obra social, a cual pertenecen y muestra su id de la tabla Pacientes.
+
+Columnas:
+* Obra_Social
+* Id_Paciente
+* Nombre_Paciente
+
+Ejemplo de uso:
+```sql
+SELECT * FROM proyecto_laboratorio.view_pacientes__por_obra_social;
+```
+
+## Vista: view_pacientes_obra_mayor_cobertura
+Descripción: Esta vista muestra principalmente datos de contacto de los pacientes que tienen la obra social de mayor cobertura.
+
+Columnas:
+* Id_Paciente
+* Nombre
+* Telefono
+* Correo_Electronico
+
+Ejemplo de uso:
+```sql
+SELECT * FROM proyecto_laboratorio.view_pacientes_obra_mayor_cobertura;
+```
+
+## Vista: view_pedidos_mayo_julio
+Descripción: Esta vista está pensada para mostrar información breve sobre los pedidos de análisis de los últimos tres meses, que en el caso de los datos cargado corresponden a mayo, junio y julio.
+
+Columnas:
+* Id_Pedido
+* Fecha
+* Id_Paciente
+* Nombre_Paciente
+
+Ejemplo de uso:
+```sql
+SELECT * FROM proyecto_laboratorio.view_pedidos_mayo_julio;
+```
+
+## Documentación de funciones
+
+## Función: edad_paciente
+Descripción: Esta función retorna la edad de un paciente ingresando su id.
+
+Parámetro:
+* id_paciente: Identificador del paciente.
+
+Retorno:
+* Edad del paciente calculando a partir de su fecha de nacimiento.
+
+Ejemplo de uso:
+```sql
+SELECT Proyecto_Laboratorio.edad_paciente(1)
+AS Edad_Paciente;
+```
+
+## Función: pedidos_bioquimico
+Descripción: Esta función retorna los pedidos de análisis asignados a un bioquímico específico, el cual es indicado mediante su nombre.
+
+Parámetro:
+* bioquimico: Nombre del bioquímico tal cual figura registrado en la tabla Staff_Bioquimica
+
+Retorno:
+* Lista de pedidos que el bioquímico indicado tiene asignados.
+
+Ejemplo de uso:
+```sql
+SELECT Proyecto_Laboratorio.pedidos_bioquimico ('Eda Sawell');
+```
+
+## Documentación de stored procedures (procedimientos almacenados)
+
+## Stored procedure: sp_eliminacion_archivo_paciente
+Descripción: Este stored procedure almacena en la tabla Archivo_Pacientes_Anteriores los pacientes que queremos eliminar de la tabla Pacientes. Luego de almacenar en la tabla primeramente mencionada elimina los registros del paciente indicado de la tabla Pacientes y también de la tabla Pedidos_Analisis por la relación de FK mediante constraint.
+
+Parámetro:
+* id_paciente: Identificador del paciente que deseamos eliminar.
+
+Ejemplo de uso:
+```sql
+CALL Proyecto_Laboratorio.sp_eliminacion_archivo_paciente (5);
+```
+Sentencias para visualizar tablas involucradas luego de ejecución del stored procedure:
+```sql
+SELECT * FROM Proyecto_Laboratorio.Archivo_Pacientes_Anteriores;
+SELECT * FROM Proyecto_Laboratorio.Pacientes;
+```
+
+
+## Stored procedure:
+Descripción: Este stored procedure actualiza el valor de cobertura de la obra social que indiquemos. El valor ingresado como cobertura_actualizada solo admite cuatro caracteres pensado para un valor númerico de 0 a 100 más el signo porcentual (%).
+
+Parámetros:
+* id_obra_social: Identificador de la obra social.
+* cobertura_actualizada: Nuevo valor cobertura de la obra social.
+
+Ejemplo de uso:
+```sql
+CALL Proyecto_Laboratorio.sp_actualizacion_cobertura (3, '35%');
+```
+Sentencias para visualizar tabla involucrada luego de ejecución del stored procedure:
+```sql
+SELECT * FROM Proyecto_Laboratorio.Obra_Social;
+```
+
+## Documentación de triggers
+
+## Trigger: trg_checker_paciente_contacto
+Descripción: Este trigger de tipo checker está pensado para validar la actualización de los medios de contacto de los pacientes. Al realizarce una actualización en la tabla Pacientes verifica que no queden nulos los campos que corresponden al teléfono o al correo electrónico. Solo permite que haya nulidad en uno de los campos y en caso de intentar dejar ambos en nulo se genera un error con el mensaje 'Solicitar medio de contacto' y la actualización no se realiza.
+
+
+Ejemplo de uso para comprobar error y mensaje de signal sqlstate:
+```sql
+UPDATE Proyecto_Laboratorio.Pacientes
+SET telefono = NULL
+WHERE id_paciente = 10;
+```
+
+## Trigger:
+Descripción: Este trigger de manera similar al caso anterior está pensado para validar una acción DML en la tabla pacientes, pero en este caso pensado para el momento de insertar nuevos pacientes. Al realizarce una inserción verifica que no queden nulos ambos campos: telefono e e_mail. En este caso también se genera un error en caso de que esto no se cumpla y devuelve el mensaje: 'Es necesario algún medio de contacto'.
+
+
+Ejemplo de uso de uso para comprobar error y mensaje de signal sqlstate:
+```sql
+INSERT INTO Proyecto_Laboratorio.Pacientes
+(nombre_completo,
+fecha_nacimiento,
+sexo,
+telefono,
+e_mail,
+id_obra_social)
+VALUES
+('Paciente_Prueba', '1949-10-21', 'M', NULL, NULL, 5);
+```
+
+## Trigger: trg_logger_actualizacion_insumos
+Descripción: Este trigger de tipo 'logger' está pensado para ir guardando un registro de los precios de insumos al ser actualizados. Este trigger realiza una inserción en la tabla logs_precio_insumos cada vez que se realiza una actualización en la tabla Insumos. La tabla que va logs_precio_insumos está pensada a modo de tabla de auditoría y almacena información sobre el id del insumo modificado, el tipo de insumo, el precio actualizado y el anterior, el usuario que realizó la actualización y el momento en el que fue realizada dicha actualización.
+
+
+Ejemplo de uso para comprobar error y mensaje de signal sqlstate:
+```sql
+UPDATE Proyecto_Laboratorio.Insumos
+SET precio = 625.00
+WHERE id_insumo = 2;
+```
+Sentencias para visualizar tablas involucradas:
+```sql
+SELECT * FROM Proyecto_Laboratorio.Insumos;
+SELECT * FROM Proyecto_Laboratorio.logs_precio_insumos;
+```
